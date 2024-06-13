@@ -17,7 +17,9 @@ all:
 	USER build
 	
 	RUN cd /home/build && \
-	    git clone --depth 1 -b linux-6.1-stan-rkr1 https://github.com/armbian/linux-rockchip.git linux
+	    git clone --depth 1 -b rk-6.1-rkr1 https://github.com/armbian/linux-rockchip.git linux && \
+	    cd linux && \
+	    git rev-parse HEAD > /home/build/linux-commit.txt
 	
 	WORKDIR /home/build/linux
 	
@@ -26,13 +28,13 @@ all:
 	
 	COPY "config" "/home/build/linux/.config"
 	
-	ARG EXTRAVERSION=-odroid-arm64
 	RUN make -j4 bindeb-pkg
 
 	RUN mkdir -p /tmp/output/ && \
 	    cp -rf /home/build/linux-* /tmp/output/ && \
 	    cd /tmp/output && \
-	    tar -cvf /tmp/output.tar *
+	    tar -cvf /tmp/output.tar * && \
+	    cp /home/build/linux-commit.txt /tmp/output/
 		
 	SAVE ARTIFACT /tmp/output/* AS LOCAL output/
 

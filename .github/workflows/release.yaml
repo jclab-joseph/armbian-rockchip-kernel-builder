@@ -1,0 +1,26 @@
+name: Release
+on:
+  push:
+    tags:
+      - ".+"
+permissions:
+  contents: write
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+       uses: actions/download-artifact@v3
+       with:
+         name: all
+      - run: ls -al
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            output/*

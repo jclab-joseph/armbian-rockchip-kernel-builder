@@ -1,0 +1,31 @@
+name: Nightly
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *' # run at 2 AM UTC
+permissions:
+  contents: write
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: all
+      - run: ls -al
+      - run: |
+          echo > note.md
+          echo "kernel: https://github.com/armbian/linux-rockchip/commit/$(cat output/linux-commit.txt)" > note.md
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Nightly
+          tag: nightly
+          artifacts: output/*
+          allowUpdates: true
+          removeArtifacts: true
+          bodyFile: note.md
