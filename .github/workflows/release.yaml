@@ -14,8 +14,6 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
-        with:
-          name: all
       - run: ls -al
       - name: Release
         uses: softprops/action-gh-release@v1
